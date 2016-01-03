@@ -1,11 +1,11 @@
 // ------------------------------------------------------------------------------------------------
 // objson.js
-// version 0.0.2
+// version 0.0.3
 // Copyright (c) doxas
 // ------------------------------------------------------------------------------------------------
 
-function objsonConvert(src, mtl){
-    var a, b, c, d, i, j, k, l, m, n, o;
+function objsonConvert(src, mtl, stringify){
+    var a, b, c, d, i, j, k, l, m, n;
     var rows;
     var source = src;
     var mtlSource = null;
@@ -109,8 +109,7 @@ function objsonConvert(src, mtl){
                 break;
             case 'f ':
                 a = rows[i].match(/[\d\/]+/g);
-                // f.push([a[0], a[1], a[2]]);
-                f.push([a[0], a[2], a[1]]);
+                f.push([a[0], a[1], a[2]]);
                 fmat.push(mtlMode);
                 k = mtlMode != null ? mtlMode : 0;
                 if(a.length > 3){
@@ -163,10 +162,6 @@ function objsonConvert(src, mtl){
                 default :
                     console.warn('objson parse error: invalid face data');
                     return;
-                    // position.push(0.0, 0.0, 0.0);
-                    // texCoord.push(0.0, 0.0);
-                    // normal.push(0.0, 0.0, 0.0);
-                    break;
             }
             if(n === 2){
                 if(a[0].length < 3){
@@ -193,34 +188,37 @@ function objsonConvert(src, mtl){
             }
         }
     }
-    for(i = 0, j = material.length; i < j; ++i){
-        for(k = 0, l = material[i].normal.length; k < l; k += 3){
-            b = [
-                material[i].normal[k],
-                material[i].normal[k + 1],
-                material[i].normal[k + 2]
-            ];
-            c = vec3Normalize(b);
-            material[i].normal[k] = c[0];
-            material[i].normal[k + 1] = c[1];
-            material[i].normal[k + 2] = c[2];
+    if(vn.length === 0){
+        for(i = 0, j = material.length; i < j; ++i){
+            for(k = 0, l = material[i].normal.length; k < l; k += 3){
+                b = [
+                    material[i].normal[k],
+                    material[i].normal[k + 1],
+                    material[i].normal[k + 2]
+                ];
+                c = vec3Normalize(b);
+                material[i].normal[k] = c[0];
+                material[i].normal[k + 1] = c[1];
+                material[i].normal[k + 2] = c[2];
+            }
         }
     }
 
-    dest = '{';
-    dest += '"face":' + f.length;
-    dest += ',"vertex":' + f.length * 3;
-    dest += ',"minmax":' + minmax;
-    dest += ',"material":' + JSON.stringify(material);
-    dest += '}';
+    if(stringify){
+        dest = '{';
+        dest += '"face":' + f.length;
+        dest += ',"vertex":' + f.length * 3;
+        dest += ',"minmax":' + minmax;
+        dest += ',"material":' + JSON.stringify(material);
+        dest += '}';
+    }else{
+        dest = {};
+        dest.face = f.length;
+        dest.vertex = f.length * 3;
+        dest.minmax = minmax;
+        dest.material = material;
+    }
     return dest;
-
-    // dest = {};
-    // dest.vertex = f.length * 3;
-    // dest.face = f.length;
-    // dest.minmax = minmax;
-    // dest.material = material;
-    // return JSON.stringify(dest);
 }
 
 function objsonMtlData(){
