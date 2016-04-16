@@ -1,10 +1,12 @@
 // ------------------------------------------------------------------------------------------------
 // objson.js
-// version 0.0.3
+// version 0.0.4
 // Copyright (c) doxas
 // ------------------------------------------------------------------------------------------------
 
-function objsonConvert(src, mtl, stringify){
+var OBJSON = function(){};
+
+OBJSON.prototype.objsonConvert = function(src, mtl, stringify){
     var a, b, c, d, i, j, k, l, m, n;
     var rows;
     var source = src;
@@ -13,10 +15,10 @@ function objsonConvert(src, mtl, stringify){
     var minmax = 0;
     var mat = 0;
     var material = [];
-    material[0] = new objsonMtlData(); // default
+    material[0] = new this.objsonMtlData(); // default
 
     // generate material object
-    if(mtl != null){
+    if(mtl !== null && mtl !== undefined){
         mtlSource = mtl;
         mtlSource = mtlSource.replace(/^#[\x20-\x7e]+\s$/gm, '');
         mtlSource = mtlSource.replace(/^g[\x20-\x7e]+\s$/gm, '');
@@ -29,7 +31,7 @@ function objsonConvert(src, mtl, stringify){
             switch(rows[i].substr(0, 2)){
                 case 'ne':
                     ++mat;
-                    material[mat] = new objsonMtlData();
+                    material[mat] = new this.objsonMtlData();
                     a = rows[i].match(/\S+/g);
                     material[mat].name = a[a.length - 1];
                     material[mat].src = '';
@@ -169,7 +171,7 @@ function objsonConvert(src, mtl, stringify){
                     b[0] = (a[0][0] - 1) * 3;
                     b[1] = (a[1][0] - 1) * 3;
                     b[2] = (a[2][0] - 1) * 3;
-                    c = faceNormal(
+                    c = this.faceNormal(
                         [v[b[0]], v[b[0] + 1], v[b[0] + 2]],
                         [v[b[1]], v[b[1] + 1], v[b[1] + 2]],
                         [v[b[2]], v[b[2] + 1], v[b[2] + 2]]
@@ -196,7 +198,7 @@ function objsonConvert(src, mtl, stringify){
                     material[i].normal[k + 1],
                     material[i].normal[k + 2]
                 ];
-                c = vec3Normalize(b);
+                c = this.vec3Normalize(b);
                 material[i].normal[k] = c[0];
                 material[i].normal[k + 1] = c[1];
                 material[i].normal[k + 2] = c[2];
@@ -216,12 +218,12 @@ function objsonConvert(src, mtl, stringify){
         dest.face = f.length;
         dest.vertex = f.length * 3;
         dest.minmax = minmax;
-        dest.material = material;
+        dest.data = material;
     }
     return dest;
-}
+};
 
-function objsonMtlData(){
+OBJSON.prototype.objsonMtlData = function(){
     this.name = '';
     this.alpha = 1.0;
     this.ambient  = [1.0, 1.0, 1.0];
@@ -237,9 +239,9 @@ function objsonMtlData(){
     this.ambientSource = '';
     this.diffuseUnit = 0;
     this.ambientUnit = 0;
-}
+};
 
-function vec3Normalize(v, d){
+OBJSON.prototype.vec3Normalize = function(v, d){
     var e, dig;
     var n = [0.0, 0.0, 0.0];
     var l = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
@@ -251,14 +253,15 @@ function vec3Normalize(v, d){
         n[2] = (v[2] * e).toFixed(dig);
     }
     return n;
-}
+};
 
-function faceNormal(v0, v1, v2){
+OBJSON.prototype.faceNormal = function(v0, v1, v2){
     var n = [];
     var vec1 = [v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]];
     var vec2 = [v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2]];
     n[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
     n[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
     n[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
-    return vec3Normalize(n);
-}
+    return this.vec3Normalize(n);
+};
+
