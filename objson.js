@@ -99,7 +99,7 @@ OBJSON.prototype.objsonConvert = function(src, mtl, stringify){
             case 'v ':
                 a = rows[i].match(/-?[\d\.]+(e(?=-)?|e(?=\+)?)?[-\+\d\.]*/g);
                 v.push(a[0] * 1.0, a[1] * 1.0, a[2] * 1.0);
-                minmax = Math.max(Math.abs(a[0]), Math.abs(a[1]), Math.abs(a[2]));
+                minmax = Math.max(minmax, Math.abs(a[0]), Math.abs(a[1]), Math.abs(a[2]));
                 break;
             case 'vn':
                 a = rows[i].match(/-?[\d\.]+(e(?=-)?|e(?=\+)?)?[-\+\d\.]*/g);
